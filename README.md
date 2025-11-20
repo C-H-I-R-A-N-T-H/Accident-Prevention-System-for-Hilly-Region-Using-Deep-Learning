@@ -1,4 +1,4 @@
-# 🚨 Smart Road Safety & Accident Detection System
+# 🚨 Accident Prevention System in Hilly Region Using Deep Learning
 
 (YOLOv8 + Arduino + Email Alerts + OLED + LCD + Ultrasonic)
 
