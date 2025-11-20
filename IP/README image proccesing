@@ -1,0 +1,176 @@
+# 🚨 AI-Based Vehicle, Animal & Accident Detection System (YOLOv8 + Arduino)
+
+This project is an advanced **real-time road safety and accident detection system** that integrates **YOLOv8 object detection**, **Arduino-based alert hardware**, **automatic email alerts with snapshots**, and **location tracking**. The system detects vehicles and animals, sends alerts to Arduino for LED/LCD notifications, and automatically emails a snapshot with GPS location if an accident is detected.
+
+---
+
+ **Key Features**
+
+**1. YOLOv8 Real-Time Object Detection**
+
+* Detects:
+
+  * Cars
+  * Trucks
+  * Motorcycles
+  * Buses
+  * Animals (dog, cow, elephant, deer, etc.)
+* Filters only relevant classes for high performance.
+
+**2. Arduino Alert Communication**
+
+The system sends serial codes to Arduino:
+
+| Object     | Signal |
+| ---------- | ------ |
+| Motorcycle | `1`    |
+| Car        | `2`    |
+| Truck/Bus  | `3`    |
+| Animal     | `4`    |
+
+ **3. Accident Detection Using Bounding Box Overlap**
+
+* Continuously checks if two detected objects are overlapping.
+* If overlap persists for **more than 3 seconds**, it's classified as an accident.
+* A snapshot is captured and emailed instantly.
+
+ **4. Automatic Email Alert**
+
+When an accident is detected:
+
+* Captures a frame
+* Gets GPS-like coordinates using IP-based geolocation
+* Sends email with:
+
+  * Accident message
+  * Google Maps link
+  * Snapshot attached
+
+ **5. Location Tracking**
+
+Uses `ipinfo.io` to fetch approximate coordinates and generates a clickable Google Maps link.
+
+---
+
+ **Dependencies**
+
+Install required packages:
+
+```bash
+pip install ultralytics opencv-python pyserial requests
+```
+
+YOLO model file:
+
+* `yolov8s.pt` (automatically downloaded by Ultralytics library)
+
+---
+
+ **Hardware Used**
+
+* Arduino UNO/Nano
+* LCD 16x2 (I2C)
+* OLED 128x64 (SSD1306)
+* LEDs (Red, Green, Animal alert)
+* Ultrasonic sensor (HC-SR04)
+* External USB Webcam
+
+---
+
+ **Arduino Serial Mapping**
+
+Python sends:
+
+* `'1'` → Motorcycle Ahead
+* `'2'` → Car Ahead
+* `'3'` → Bus/Truck Ahead
+* `'4'` → Animal Ahead
+* `'0'` → No detection (Safe)
+
+Arduino then updates:
+
+* LCD Display
+* LEDs (Red, Green, Animal)
+* OLED for distance monitoring
+
+---
+
+**Project Structure**
+
+```
+├── accident_snapshots/        # Stores captured accident images
+├── main.py                     # YOLO + Detection + Email logic
+├── Arduino_Code.ino           # Arduino LCD/OLED alert logic
+```
+
+---
+
+ **How It Works**
+
+ **Main Loop**
+
+1. Capture video from external webcam.
+2. Run YOLOv8 detection.
+3. Identify vehicle/animal type.
+4. Send signal to Arduino.
+5. Check bounding box overlap.
+6. If overlap > 3 sec → trigger accident.
+7. Save snapshot.
+8. Send email alert.
+
+---
+
+ **Snapshot Saving**
+
+Images are saved inside:
+
+```
+accident_snapshots/snapshot_YYYYMMDD_HHMMSS.jpg
+```
+
+---
+
+ **Email Alert Format**
+
+Subject: **"🚨 Accident Detected"**
+
+Body includes:
+
+```
+Accident detected!
+📍 Location: https://www.google.com/maps?q=<lat,long>
+Snapshot attached.
+```
+
+---
+
+ **API Used**
+
+`ipinfo.io` → Get approximate location based on public IP.
+
+---
+
+ **Run the System**
+
+Run Python script:
+
+```bash
+python main.py
+```
+
+Ensure Arduino is connected to the correct COM port.
+
+---
+
+ **Testing**
+
+* Show two vehicles overlapping to simulate a collision.
+* Verify:
+
+  * LCD alert updates
+  * LEDs change state
+  * OLED displays distance
+  * Email with location + snapshot arrives
+
+---
+
